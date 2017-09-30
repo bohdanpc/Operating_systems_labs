@@ -1,20 +1,16 @@
 #include <iostream>
 #include <sstream>
+#include "cPriorityScheduler.h"
 
 int main() {
-	std::stringstream ss;
-	ss << "hello world, bye ";
 
-	std::string str;
-	std::getline(ss, str, ',');
-	std::cout << str << std::endl;
-	
-	std::getline(ss, str, ',');
-	std::cout << str << std::endl;
-
-	std::string abc = "a";
-	std::getline(ss, abc, ',');
-	std::cout << abc << std::endl;
-
+	std::unique_ptr<PriorityScheduler> myScheduler(new PriorityScheduler);
+	try {
+		myScheduler->ParseSchedulerFile("db_in.csv");
+		myScheduler->RunScheduler();
+	}
+	catch (PriorityScheduler::ErrorType &err) {
+		std::cout << "Error: " << (int)err << std::endl;
+	}
 	return 0;
 }

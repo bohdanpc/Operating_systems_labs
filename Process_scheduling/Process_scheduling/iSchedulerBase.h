@@ -14,6 +14,6 @@ public:
 	virtual void BuildSchedulerResFile(const std::string &outFileName) = 0;
 	virtual void RunScheduler() = 0;
 protected:
-	std::queue<processType> processesList;
-	std::queue<processType> outputProcessesList;
+	std::list<processType> processesList;
+	std::list<processType> outputProcessesList;
 };
