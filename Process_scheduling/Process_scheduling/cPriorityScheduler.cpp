@@ -68,6 +68,9 @@ void PriorityScheduler::ParseSchedulerFile(const std::string &inFileName) {
 
 	tProcess currProcess;
 	while (std::getline(fin, field, '\n')) {
+		if (field[0] == '#')
+			continue;
+
 		taskStream << field;
 	
 		getProcName(taskStream, currProcess);
@@ -82,6 +85,57 @@ void PriorityScheduler::ParseSchedulerFile(const std::string &inFileName) {
 	isFileRead = true;
 }
 
+/*
+* analyse all queues and choose task with the highest possible priority
+* @return:
+*   TRUE if task was selected and FALSE if there's no tasks in queues
+*/
+bool PriorityScheduler::chooseWorkTask(tProcess &currWorkTask) {
+	for (int i = 0; i < QUEUES_COUNT; i++) 
+		if (priorityQueues[i].size()) {
+			currWorkTask = priorityQueues[i].front();
+			priorityQueues[i].pop_front();
+			return false;
+		}
+	return true;
+}
+
+
+bool PriorityScheduler::calculateOneTick(tProcess &workProcess, int &timer, int &workTimeLeft) {
+	workTimeLeft--;
+	timer++;
+	if (workTimeLeft == 0) {
+		workProcess.finishTime = timer;
+		workProcess.isFinished = true;
+		outputProcessesList.push_back(workProcess);
+		return true;
+	}
+	return false;
+}
+
+
+void PriorityScheduler::processIncomeTasks(const int &timer) {
+	tProcess task;
+
+	if (processesList.size())
+		task = processesList.front();
+	else return;
+
+	//check for events to add to priority Queues
+	while (task.arrivalTime == timer) {
+		processesList.pop_front();
+
+		if (task.priority < QUEUES_COUNT)
+			priorityQueues[task.priority].push_back(task);
+		else
+			priorityQueues[QUEUES_COUNT - 1].push_back(task);
+
+		if (processesList.size())
+			task = processesList.front();
+		else break;
+	}
+}
+
 
 void PriorityScheduler::RunScheduler() {
 	if (!isFileRead)
@@ -92,38 +146,16 @@ void PriorityScheduler::RunScheduler() {
 	});
 
 	int timer = 0;
-	tProcess task;
 	tProcess currWorkTask;
-	int timeLeftToWorkOn = 0;
+	int workTimeLeft = 0;
 	bool isFree = true;
 
 	while (true) {
-		if (processesList.size())
-			task = processesList.front();
-		
-		//check for events to add to priority Queues
-		while (task.arrivalTime == timer && processesList.size()) {
-			processesList.pop_front();
-
-			if (task.priority < QUEUES_COUNT) 
-				priorityQueues[task.priority].push_back(task);
-			else
-				priorityQueues[QUEUES_COUNT-1].push_back(task);
-
-			if (processesList.size())
-				task = processesList.front();
-		}
+		processIncomeTasks(timer);
 
 		//choose task to work on working on task
 		if (isFree) {
-			for (int i = 0; i < QUEUES_COUNT; i++) {
-				if (priorityQueues[i].size()) {
-					currWorkTask = priorityQueues[i].front();
-					priorityQueues[i].pop_front();
-					isFree = false;
-					break;
-				}
-			}
+			isFree = chooseWorkTask(currWorkTask);
 			if (isFree && processesList.size()) {
 				timer++;
 				continue;
@@ -133,29 +165,12 @@ void PriorityScheduler::RunScheduler() {
 					break;
 
 			currWorkTask.delayTime = timer - currWorkTask.arrivalTime;
-			timeLeftToWorkOn = currWorkTask.workTime;
+			workTimeLeft = currWorkTask.workTime;
 			
-			timeLeftToWorkOn--;
-			timer++;
-			if (timeLeftToWorkOn == 0) {
-				currWorkTask.finishTime = timer;
-				currWorkTask.isFinished = true;
-				outputProcessesList.push_back(currWorkTask);
-				isFree = true;
-			}
+			isFree = calculateOneTick(currWorkTask, timer, workTimeLeft);
 		}
-		else {
-			timeLeftToWorkOn--;
-			timer++;
-			if (timeLeftToWorkOn == 0) {
-				currWorkTask.finishTime = timer;
-				currWorkTask.isFinished = true;
-				outputProcessesList.push_back(currWorkTask);
-				isFree = true;
-			}
-		}
+		else 
+			isFree = calculateOneTick(currWorkTask, timer, workTimeLeft);
 	}
-
-	int a;
-	a = 5;
+	return;
 }

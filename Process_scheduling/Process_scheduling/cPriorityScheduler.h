@@ -43,17 +43,15 @@ public:
 	virtual void ParseSchedulerFile(const std::string &inFileName);//тут визначатиметься кількість черг};
 																	  //і читаються данні про всі процеси з файла
 	virtual void BuildSchedulerResFile(const std::string &outFileName) {};
-	virtual void RunScheduler();		//пройтися по черзі з усіма задачами
-										//створити необхідну кількість черг залежно від кількості різних пріоритетів
-										//   ... std::unique_ptr<std::queue<tProcess> > queue1(new std::queue); ???
-										//аля... priorityQUeues.push_back(std::move(queue1));
+	virtual void RunScheduler();		
 private:
 	void getProcName(std::stringstream &taskStream, tProcess &currProcess);
 	void getArrivalTime(std::stringstream &taskStream, tProcess &currProcess);
 	void getWorkTime(std::stringstream &taskStream, tProcess &currProcess);
 	void getPriority(std::stringstream &taskStream, tProcess &currProcess);
-
-	//черги створюються динамічно залежно від кількості різних пріоритетів
+	bool calculateOneTick(tProcess &workProcess, int &timer, int &workTimeLeft);
+	void processIncomeTasks(const int &timer);	//add tasks from GENERAL list to queues if their's time has come
+	bool chooseWorkTask(tProcess &currWorkTask);
 	std::vector<std::list<tProcess> > priorityQueues;
 	
 	bool isFileRead;
