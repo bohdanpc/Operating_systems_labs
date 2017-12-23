@@ -1,0 +1,8 @@
+# Comment line starts with '#' symbol
+# ProcName, arrivalTime, WorkingTime, Priority
+Proc1, 		2,	     2, 	0
+Proc2, 		3, 	     4, 	1
+PRoc3, 		1, 	     2, 	2
+PROC4,		3,	     5,		0
+PROC5,		1,	     1,		1
+PROC6,		5,	     2,		0

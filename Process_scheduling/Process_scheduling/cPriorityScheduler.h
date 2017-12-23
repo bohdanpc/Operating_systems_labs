@@ -32,18 +32,18 @@ public:
 
 	enum class ErrorType {
 		CannotOpenInFile,
+		CannotFindOutFile,
 		InFileNotRead,
 		InvalidInputFileFormat,
 		InvalidArrivalTimeFormat,
 		ValueOutOfRange,
-
 		OUTFILE_WRITE_FAIL,
 	};
 
-	virtual void ParseSchedulerFile(const std::string &inFileName);//тут визначатиметься кількість черг};
-																	  //і читаються данні про всі процеси з файла
-	virtual void BuildSchedulerResFile(const std::string &outFileName) {};
-	virtual void RunScheduler();		
+	virtual void ParseSchedulerFile(const std::string &inFileName);
+	virtual void BuildResFile(const std::string &outFileName);
+	virtual void BuildExlResFile(const std::string &outFileName);
+	virtual void RunScheduler();	
 private:
 	void getProcName(std::stringstream &taskStream, tProcess &currProcess);
 	void getArrivalTime(std::stringstream &taskStream, tProcess &currProcess);

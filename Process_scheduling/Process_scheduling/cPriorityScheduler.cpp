@@ -1,5 +1,6 @@
 #include "cPriorityScheduler.h"
 #include <fstream>
+#include <iomanip>
 
 PriorityScheduler::PriorityScheduler() : priorityQueues(QUEUES_COUNT, std::list<tProcess>()) {}
 
@@ -172,5 +173,41 @@ void PriorityScheduler::RunScheduler() {
 		else 
 			isFree = calculateOneTick(currWorkTask, timer, workTimeLeft);
 	}
-	return;
+}
+
+
+void PriorityScheduler::BuildExlResFile(const std::string &outFileName) {
+	std::ofstream fout(outFileName);
+
+	if (!fout) {
+		throw ErrorType::CannotFindOutFile;
+	}
+
+	fout << "#Process name(Priority), Arrival Time, Delay Time, Working Time" << std::endl;
+	for (auto &task : outputProcessesList) {
+		fout << task.name << "(" << task.priority << "), "
+			<< task.arrivalTime << ", " << task.delayTime << ", "
+			<< task.workTime << std::endl;
+	}
+}
+
+
+void PriorityScheduler::BuildResFile(const std::string &outFileName) {
+	std::ofstream fout(outFileName);
+
+	if (!fout) {
+		throw ErrorType::CannotFindOutFile;
+	}
+
+	fout << std::setw(15) << "#Process name(Priority)," <<
+			std::setw(15) << "Arrival Time, " << 
+			std::setw(15) << "Delay Time, " <<
+			std::setw(15) << "Working Time, " <<
+			std::setw(15) << "Finish Time, " << std::endl;
+
+	for (auto &task : outputProcessesList) {
+		fout << std::setw(15) << task.name << "(" << task.priority << "), "
+			<< std::setw(15) << task.arrivalTime << ", " << std::setw(15) << task.delayTime << ", "
+			<< std::setw(15) <<task.workTime << ", " << std::setw(15) << task.finishTime << std::endl;
+	}
 }

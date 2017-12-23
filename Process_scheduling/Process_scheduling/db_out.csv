@@ -1,0 +1,7 @@
+#Process name(Priority), Arrival Time,    Delay Time,  Working Time,   Finish Time, 
+          PROC5(1),               1,               0,               1,               2
+          Proc1(0),               2,               0,               2,               4
+          PROC4(0),               3,               1,               5,               9
+          PROC6(0),               5,               4,               2,              11
+          Proc2(1),               3,               8,               4,              15
+          PRoc3(2),               1,              14,               2,              17
